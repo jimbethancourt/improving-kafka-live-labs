@@ -49,7 +49,6 @@ This lab will be utilizing two fully-managed source connectors (Datagen and MySQ
 ## [Prerequisites](#prerequisites)
 
 ### Sign up for Confluent Cloud Account
-
 Sign up for a Confluent Cloud account [here](https://www.confluent.io/get-started/).
 
 > **Note:** You will create resources during this lab that will incur costs. When you sign up for a Confluent Cloud account, you will get free credits to use in Confluent Cloud. This will cover the cost of resources created during the lab. More details on the specifics can be found [here](https://www.confluent.io/get-started/).
@@ -62,8 +61,12 @@ Ports `443` and `9092` need to be open to the public internet for outbound traff
 - portquiz.net:9092
 
 ### Sign up for MongoDB account
+Region: **AWS-US-West-2**
 
-In order to complete this lab, you need to have a MongoDB account. The free tier works fine, but make sure you select AWS-US-West-2 region. Sign up for a MongoDB account [here](https://www.mongodb.com/).
+In order to complete this lab, you need to have a MongoDB account. The free tier works fine, but make sure you select **AWS-US-West-2** region. Sign up for a MongoDB account [here](https://www.mongodb.com/).
+
+![image info](./images/mongo-signup.png)
+
 
 ### MySQL database
 
@@ -87,6 +90,7 @@ In this lab, you will be connecting to a MySQL database that your instructor has
 ---
 
 ## <a name="step2"></a>Step 2: Create an environment and cluster
+Region: **AWS-US-West-2**  
 
 An environment contains Confluent clusters and its deployed components such as Connect, ksqlDB, and Schema Registry. You have the ability to create different environments based on your company's requirements. Confluent has seen companies use environments to separate Development/Testing, Pre-Production, and Production clusters.
 
@@ -114,6 +118,7 @@ An environment contains Confluent clusters and its deployed components such as C
 
    - Specify a meaningful **Cluster Name** and then review the associated _Configuration & Cost_, _Usage Limits_, and _Uptime SLA_ before clicking **Launch Cluster**.
 
+![image info](./images/create-cluster.png)
 ---
 
 ## <a name="step3"></a>Step 3: Create an API key pair
@@ -200,11 +205,13 @@ An environment contains Confluent clusters and its deployed components such as C
 
    > Click **Create topic on my own** or if you already created a topic, click on the **+ Add topic** button on the top right side of the table.
 
-1. Type **mysql.demo.USERS_INFO** as the Topic name. The name of the topic is crucial so make sure you use the exact name and capitalization.
+1. Type **mysql.demo.users_info** as the Topic name. The name of the topic is crucial so make sure you use the exact name and capitalization.
 
 1. Click on **Show advanced settings** and under **Storage → Cleanup policy → Compact** and **Retention time → Infinite** and then click on **Create**.
 
-1. When prompted to create a schema, click "Skip".  We're using Avro which will automatically register with Schema Registry. 
+1. When prompted to create a schema, click "Skip".  We're using Avro which will automatically register with Schema Registry.
+
+![image info](./images/create-users-info-topic.png)
 ---
 
 ## <a name="step8"></a>Step 8: Create a MySQL CDC Source connector
@@ -214,7 +221,7 @@ An environment contains Confluent clusters and its deployed components such as C
 1. In the search bar search for **MySQL CDC** and select the **MySQL CDC Source** which is a fully-managed source connector.
 
 1. You can click "Use an Existing API key" and enter the key you created, or you can create a new key here just for MySQL.
- 
+
 1. Use the following parameters to configure your connector. **snapshot.mode** is an advanced configuration on the second screen. **output.data.format** _must_ be avro, but the **output record key format** should be JSON. The MySQL Standard port number is **3306**.
 
 ```
@@ -226,10 +233,10 @@ An environment contains Confluent clusters and its deployed components such as C
     "kafka.auth.mode": "KAFKA_API_KEY",
     "kafka.api.key": "<your_key>",
     "kafka.api.secret": "<your_secret>",
-    "database.hostname": "kafka-data-pipelines.<hostname>.us-west-2.rds.amazonaws.com",
+    "database.hostname": "<provided>.mysql.database.azure.com",
     "database.port": "3306",
-    "database.user": "admin",
-    "database.password": "<your_password>",
+    "database.user": "flexadmin",
+    "database.password": "<database_password>",
     "database.server.name": "mysql",
     "database.ssl.mode": "preferred",
     "snapshot.mode": "when_needed",
@@ -303,7 +310,7 @@ With ksqlDB, you have the ability to leverage streams and tables from your topic
 1. Create a stream from `users_info` topic.
 
    ```SQL
-   CREATE STREAM USERS_STREAM WITH (KAFKA_TOPIC ='mysql.demo.USERS_INFO', KEY_FORMAT  ='JSON', VALUE_FORMAT='AVRO');
+   CREATE STREAM USERS_STREAM WITH (KAFKA_TOPIC ='mysql.demo.users_info', KEY_FORMAT  ='JSON', VALUE_FORMAT='AVRO');
    ```
 
 1. Make sure **auto.offset.reset** is set to **Earliest** and verify the `USERS_STREAM` stream below.
@@ -314,7 +321,7 @@ With ksqlDB, you have the ability to leverage streams and tables from your topic
 
 1. Stop the running query by clicking on **Stop**.
 
-1. Create `USERS` table based on `USERS_INFO` stream you just created.
+1. Create `USERS` table based on `users_info` stream you just created.
 
    ```SQL
    CREATE TABLE USERS WITH (FORMAT='AVRO') AS
@@ -396,6 +403,8 @@ With ksqlDB, you have the ability to leverage streams and tables from your topic
 
 1. Enter the following configuration details. The remaining fields can be left blank.
 
+![image info](./images/mongo-connector-setup.png)
+
    ```
    {
     "name": "MongoDbAtlasSinkConnector_0",
@@ -423,6 +432,8 @@ With ksqlDB, you have the ability to leverage streams and tables from your topic
    ```
 
 1. In this lab, we decided to mask customer's date of birth before sinking the stream to MongoDB Atlas. We are leverage Single Message Transforms (SMT) to achieve this goal. Since date of birth is of type `DATE` and we want to replace it with a string pattern, we will achieve our goal in a 2 step process. First, we will cast the date of birth from `DATE` to `String`, then we will replace that `String` value with a pattern we have pre-defined. The Single Message Transforms are available in the configuration UI of the MongoDB Connector.
+
+![image info](./images/smt-config.png)
 
    > For more information on Single Message Transforms (SMT) refer to our [documentation](https://docs.confluent.io/cloud/current/connectors/single-message-transforms.html) or watch the series by Robin Moffatt, staff developer advocate at Confluent [here](https://www.youtube.com/watch?v=3Gj_SoyuTYk&list=PL5T99fPsK7pq7LiaaL-S6b7wQqzxyjgya&ab_channel=RobinMoffatt).
 
