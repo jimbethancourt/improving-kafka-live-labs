@@ -224,6 +224,10 @@ An environment contains Confluent clusters and its deployed components such as C
 
 1. Use the following parameters to configure your connector. **snapshot.mode** is an advanced configuration on the second screen. **output.data.format** _must_ be avro, but the **output record key format** should be JSON. The MySQL Standard port number is **3306**.
 
+![image info](./images/cdc-setup.png)
+
+![image info](./images/cdc-setup-2.png)
+
 ```
 {
   "name": "MySqlCdcSourceConnector_0",
@@ -235,7 +239,7 @@ An environment contains Confluent clusters and its deployed components such as C
     "kafka.api.secret": "<your_secret>",
     "database.hostname": "<provided>.mysql.database.azure.com",
     "database.port": "3306",
-    "database.user": "flexadmin",
+    "database.user": "labuser",
     "database.password": "<database_password>",
     "database.server.name": "mysql",
     "database.ssl.mode": "preferred",
