@@ -49,7 +49,7 @@ This lab will be utilizing two fully-managed source connectors (Datagen and MySQ
 ## [Prerequisites](#prerequisites)
 
 ### Sign up for Confluent Cloud Account
-Sign up for a Confluent Cloud account [here](https://www.confluent.io/get-started/).
+Sign up for a Confluent Cloud account [here](https://www.confluent.io/get-started/).  You can use plussing (email+kafka-workshsop@mydomain.com) to register if your email provider supports it.
 
 > **Note:** You will create resources during this lab that will incur costs. When you sign up for a Confluent Cloud account, you will get free credits to use in Confluent Cloud. This will cover the cost of resources created during the lab. More details on the specifics can be found [here](https://www.confluent.io/get-started/).
 
